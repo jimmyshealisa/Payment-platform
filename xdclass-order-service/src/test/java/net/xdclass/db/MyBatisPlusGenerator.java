@@ -26,10 +26,10 @@ public class MyBatisPlusGenerator {
         // 是否支持AR模式
         config
                 // 作者
-                .setAuthor("二当家小D")
+                .setAuthor("qilululi")
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
-                .setOutputDir("/Users/xdclass/Desktop/demo/src/main/java")
+                .setOutputDir("/Users/lijiaqi/Desktop/demo/src/main/java")
 
                 // 文件覆盖
                 .setFileOverride(true)

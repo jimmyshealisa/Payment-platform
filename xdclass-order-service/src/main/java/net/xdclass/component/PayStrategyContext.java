@@ -41,5 +41,15 @@ public class PayStrategyContext {
 
     }
 
+    /**
+     * 根据支付的策略，调用不同的退单
+     * @param payInfoVO
+     * @return
+     */
+    public String executeRefund(PayInfoVO payInfoVO){
+        return this.payStrategy.refund(payInfoVO);
+
+    }
+
 
 }

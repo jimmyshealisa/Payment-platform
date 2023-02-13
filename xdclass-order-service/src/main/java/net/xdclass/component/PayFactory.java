@@ -85,6 +85,32 @@ public class PayFactory {
     }
 
 
+    /**
+     * 退单
+     * 支付成功返回非空，其他返回空
+     * @param payInfo
+     * @return
+     */
+    public String refund(PayInfoVO payInfo) {
+        String payType = payInfo.getPayType();
+        PayStrategyContext payStrategyContext = null;
+        if (ProductOrderPayTypeEnum.ALIPAY.name().equalsIgnoreCase(payType)) {
+
+            payStrategyContext = new PayStrategyContext(alipayStrategy);
+        }
+
+        if (ProductOrderPayTypeEnum.WECHAT.name().equalsIgnoreCase(payType)) {
+
+            payStrategyContext = new PayStrategyContext(wechatPayStrategy);
+        }
+
+        if (payStrategyContext != null) {
+            return payStrategyContext.executeRefund(payInfo);
+        }
+        return "";
+    }
+
+
 
 
 }
