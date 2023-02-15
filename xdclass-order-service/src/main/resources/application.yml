@@ -77,5 +77,5 @@ alipay:
   #支付成功的跳转页面
   success_return_url: https://xdclass.net
 
-  #支付宝通知回调接口
+  #支付宝通知回调接口, 蚂蚁金服开放平台应用后台也需要配置对应的地址
   callback_url: https://xdclass.net

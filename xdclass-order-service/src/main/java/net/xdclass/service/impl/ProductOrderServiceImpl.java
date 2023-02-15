@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -447,5 +448,17 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         }
 
 
+    }
+
+    /**
+     * 支付结果更新订单状态
+     * @param alipay
+     * @param params
+     * @return
+     */
+    @Override
+    public JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum alipay, Map<String, String> params) {
+        
+        return null;
     }
 }
