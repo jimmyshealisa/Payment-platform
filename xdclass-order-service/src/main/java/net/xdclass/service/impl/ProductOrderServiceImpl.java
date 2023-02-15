@@ -452,13 +452,28 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     /**
      * 支付结果更新订单状态
-     * @param alipay
+     * @param payType
      * @param params
      * @return
      */
     @Override
-    public JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum alipay, Map<String, String> params) {
-        
-        return null;
+    public JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum payType, Map<String, String> params) {
+        if(payType.name().equalsIgnoreCase(ProductOrderPayTypeEnum.ALIPAY.name())) {
+            //获取商户订单号
+            String outTradNo = params.get("out_trade_no");
+            //交易状态
+            String tradeStatus = params.get("trade_status");
+
+            if("TRAD_SUCCESS".equalsIgnoreCase(tradeStatus) || "TRAD_FINISHED".equalsIgnoreCase(tradeStatus)) {
+                //更新订单状态
+                productOrderMapper.updateOrderPayState(outTradNo, ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
+                
+                return JsonData.buildSuccess();
+            }
+        }
+        if(payType.name().equalsIgnoreCase(ProductOrderPayTypeEnum.WECHAT.name())){
+            //微信支付  TODO
+        }
+        return JsonData.buildResult(BizCodeEnum.PAY_ORDER_CALLBACK_NOT_SUCCESS);
     }
 }
