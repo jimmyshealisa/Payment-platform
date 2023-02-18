@@ -79,7 +79,7 @@ public class CallBackController {
                 paramsMap.put(name, "");
             }
         }
-        System.out.println(paramsMap);
+        log.info(paramsMap.toString());
         return paramsMap;
     }
 
