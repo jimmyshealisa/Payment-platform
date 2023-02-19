@@ -29,7 +29,7 @@ import net.xdclass.util.JsonData;
 @Controller
 @RequestMapping("/api/callback/order/v1")
 @Slf4j
-public class CallBackController {
+public class  CallBackController {
     @Autowired
     private ProductOrderService productOrderService;
 

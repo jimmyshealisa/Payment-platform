@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.component.PayFactory;
 import net.xdclass.config.RabbitMQConfig;
+import net.xdclass.constant.TimeConstant;
 import net.xdclass.enums.*;
 import net.xdclass.exception.BizException;
 import net.xdclass.feign.CouponFeignSerivce;
@@ -28,6 +29,7 @@ import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
 import net.xdclass.vo.CouponRecordVO;
 import net.xdclass.vo.OrderItemVO;
+import net.xdclass.vo.PayInfoVO;
 import net.xdclass.vo.ProductOrderAddressVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -149,9 +151,17 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
         //创建支付  TODO
         //payFactory.pay()
+        PayInfoVO payInfoVO = new PayInfoVO(orderOutTradeNo,
+                productOrderDO.getPayAmount(), orderRequest.getPayType(), orderRequest.getClientType(), "", "",
+                TimeConstant.ODER_PAY_TIMEOUT_MILLS);
+        String payResult = payFactory.pay(payInfoVO);
+        if (StringUtils.isNoneBlank(payResult)){
+            log.info("创建支付订单成功:payInfoVo={}, payResult={}", payInfoVO, payResult);
+            return JsonData.buildSuccess(payResult);
+        }
+        log.error("创建支付订单失败：{}", payResult);
 
-
-        return null;
+        return JsonData.buildResult(BizCodeEnum.PAY_ORDER_FAIL);
     }
 
     /**
@@ -206,7 +216,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         productOrderDO.setOutTradeNo(orderOutTradeNo);
         productOrderDO.setCreateTime(new Date());
         productOrderDO.setDel(0);
-        productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
+//        productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
 
         //实际支付的价格
         productOrderDO.setPayAmount(orderRequest.getRealPayAmount());
@@ -214,7 +224,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         //总价，未使用优惠券的价格
         productOrderDO.setTotalAmount(orderRequest.getTotalAmount());
         productOrderDO.setState(ProductOrderStateEnum.NEW.name());
-        ProductOrderTypeEnum.valueOf(orderRequest.getPayType()).name();
+        productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
         productOrderDO.setPayType(ProductOrderPayTypeEnum.valueOf(orderRequest.getPayType()).name());
 
         productOrderDO.setReceiverAddress(JSON.toJSONString(addressVO));
@@ -429,11 +439,10 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         }
 
         //向第三方支付查询订单是否真的未支付  TODO
-
-
-
-
-        String payResult = "";
+        PayInfoVO payInfoVO = new PayInfoVO();
+        payInfoVO.setPayType(productOrderDO.getPayType());
+        payInfoVO.setOutTradeNo(orderMessage.getOutTradeNo());
+        String payResult = payFactory.queryPaySuccess(payInfoVO);
 
         //结果为空，则未支付成功，本地取消订单
         if(StringUtils.isBlank(payResult)){
